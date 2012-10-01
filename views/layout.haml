@@ -1,0 +1,17 @@
+!!!
+%html
+	%head
+		%title University Events
+		%link(rel="stylesheet" href="css/bootstrap.css" type ="text/css")
+		/%style{:type=>"text/css"}
+		/	body{padding-top:5px;}
+	%body
+		.navbar
+			.navbar-inner
+				.container
+					%ul
+						%li
+							%a{:class=>"brand", :href=>"/"} Title Goes Here
+		.container
+		/add a menu section that stays the same on all pages
+			=yield
