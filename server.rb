@@ -10,30 +10,30 @@
 
 require 'sinatra'
 require 'haml'
-require 'pg'
+#require 'pg'
 #require 'mysql'
 require 'mysql2'
 require 'json'
-#require 'config.rb'
+require './config/MyConfig.rb'
 
 #set the format for all haml docs used
 set :haml, :format => :html5
 
 #set up connection to mysql database
-#db = Mysql.new '127.0.0.1', 'root', 'nbk8086', 'unievents'
-
-dbconn = Mysql2::Client.new(:host => "127.0.0.1", :username => "root", :password => "", :database => "unievents")
-
+dbconn = Mysql2::Client.new(:host => MyConfig::Host, :username => MyConfig::Username, :password => MyConfig::Password, :database => MyConfig::Database)
+##### set up so that errors are caught and connection closed 
 #conn = PG.connect( dbhost: '127.0.0.1', dbname: "unievents" )
 
 get '/' do
 	#:haml index
-	#redirect 
+	redirect to('/events')
 end
 
 # handle http GET request on customer
 get '/cust' do
+	@res = dbconn.query("SELECT * FROM Customers;");
 
+	haml :customers
 end
 
 # handle http POST request on customer
@@ -72,7 +72,14 @@ end
 
 # handle http POST request on event
 post '/event' do
+#get the name, details, date and time from body of request
+	#request.body.rewind #incase the body has already been read
+	#body = JSON.parse request.body.read
+	#puts #{body["name"]}
+end
 
+get '/event/new' do
+	haml :eventform
 end
 
 #handle http PUT request on event
@@ -87,7 +94,9 @@ end
 
 # handle http GET request on staff
 get '/staff' do
+	@res = dbconn.query("SELECT * FROM Staff;")
 
+	haml :staff
 end
 
 # handle http POST request on staff
