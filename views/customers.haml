@@ -1,0 +1,22 @@
+%h1 Customers
+%p
+- @res.each do |row|
+	%table{:class=>"table table-striped"}
+		%thead
+			%tr
+				%th First Name
+				%th Last Name
+				%th E-mail
+				%th Date of Birth
+				%th
+				%th
+		%tbody
+			%tr
+				%td== #{row["firstname"]} 
+				%td== #{row["lastname"]}
+				%td== #{row["email"]} 
+				%td== #{row["dob"]}
+				%td 
+					%a{:href=>"#"} Edit
+				%td
+					%a{:href=>"#"} Remove
