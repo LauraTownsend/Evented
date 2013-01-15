@@ -31,10 +31,8 @@ end
 
 # handle http GET request on events (show all events)
 get '/events' do
-	#"Hello world"
-
 	# select all the events from the database in order of date
-	@res = dbconn.query("SELECT id,name,details,DATE_FORMAT(date, '%d-%m-%y') AS date, time FROM Events ORDER BY date;")
+	@res = dbconn.query("SELECT id,name,details,DATE_FORMAT(date, '%d-%m-%y') AS date, time FROM events ORDER BY date;")
 
 	haml :index
 end
@@ -42,7 +40,7 @@ end
 # handle http GET request for one event
 get '/events/:id' do
 	# select the event with selected id
-	@res = dbconn.query("SELECT id,name,details,DATE_FORMAT(date, '%d-%m-%y') AS date, time FROM Events WHERE id=#{params[:id]};")
+	@res = dbconn.query("SELECT id,name,details,DATE_FORMAT(date, '%d-%m-%y') AS date, time FROM events WHERE id=#{params[:id]};")
 	
 	haml :eventview
 end
@@ -59,11 +57,11 @@ post '/event' do
 	time = dbconn.escape(params[:time])
 
 	#if the event does not exist already, add it to the event table
-	test = dbconn.query("SELECT * FROM Events WHERE name = '#{name}' AND date = '#{date}';")
+	test = dbconn.query("SELECT * FROM events WHERE name = '#{name}' AND date = '#{date}';")
 	if(test.count == 0)
-		@res = dbconn.query("INSERT INTO Events(name, details, date, time) VALUES ('#{name}','#{details}', '#{date}', #{time});")
+		@res = dbconn.query("INSERT INTO events(name, details, date, time) VALUES ('#{name}','#{details}', '#{date}', #{time});")
 		eid = 
-		dbconn.query("SELECT * FROM Events WHERE name = '#{name}' AND details = '#{details}';").each do |row|
+		dbconn.query("SELECT * FROM events WHERE name = '#{name}' AND details = '#{details}';").each do |row|
 			redirect "/events/#{row["id"]}"
 		end
 	else
@@ -83,19 +81,19 @@ end
 
 # handle http DELETE request on event
 delete '/event/:id' do
-	query = dbconn.query("DELETE FROM Events WHERE id ='#{id}';")
+	query = dbconn.query("DELETE FROM events WHERE id ='#{id}';")
 end
 
 # handle http GET request on staff
 get '/staff' do
-	@res = dbconn.query("SELECT * FROM Staff;")
+	@res = dbconn.query("SELECT * FROM staff;")
 
 	haml :staff
 end
 
 # handle get reqest for one staff member
 get '/staff/:id' do
-	@res = dbconn.query("SELECT * FROM Staff WHERE id = #{params[:id]};")
+	@res = dbconn.query("SELECT * FROM staff WHERE id = #{params[:id]};")
 
 	haml :staff
 end
@@ -114,24 +112,31 @@ delete '/staff' do
 
 end
 
-# handle http GET request on customer
-get '/cust' do
-	@res = dbconn.query("SELECT * FROM Customers;");
+##### USER requests
 
-	haml :customers
+# handle http GET request on user
+get '/user' do
+	@res = dbconn.query("SELECT * FROM users;");
+
+	haml :users
 end
 
-# handle http POST request on customer
-post '/cust' do
+#### endpoints for creating a new user
+get '/user/new' do
+	haml :newuser
+end
+
+# handle http POST request on user
+post '/user' do
 
 end
 
-# handle http PUT request on customer
-put '/cust' do
+# handle http PUT request on user
+put '/user' do
 
 end
 
-# handle http DELETE request on customer
-delete '/cust' do
+# handle http DELETE request on user
+delete '/user' do
 
 end
