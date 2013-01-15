@@ -3,19 +3,19 @@
 	.control-group
 		%label{:class=>"control-label", :for=>"name"} Event Name
 		.controls
-			%input{:type=>"text", :placeholder=>"event name", :id=>"name"}
+			%input{:type=>"text", :placeholder=>"event name", :id=>"name", :name=>"name"}
 	.control-group
 		%label{:class=>"control-label Details", :for=>"details"} Details
 		.controls
-			%textarea{:rows=>"3", :placeholder=>"details about event", :id=>"details"}
+			%textarea{:rows=>"3", :placeholder=>"details about event", :id=>"details", :name=>"details"}
 	.control-group
 		%label{:class=>"control-label", :for=>"date"} Date
 		.controls
-			%input{:type=>"date", :id=>"date"}
+			%input{:type=>"date", :id=>"date", :name=>"date"}
 	.control-group
 		%label{:class=>"control-label", :for=>"time"} Time
 		.controls	
-			%input{:type=>"text", :id=>"time", :placeholder=>"time"}
+			%input{:type=>"text", :id=>"time", :placeholder=>"time", :name=>"time"}
 	.control-group
 		%label{:class=>"control-label", :for=>"submit"}
 		.controls

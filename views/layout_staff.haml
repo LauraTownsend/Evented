@@ -1,0 +1,36 @@
+!!!
+%html
+	%head
+		%title University Events - Administration
+		%link(rel="stylesheet" href="/css/bootstrap.css" type ="text/css")
+	%body
+		.navbar
+			.navbar-inner
+				.container
+					%ul
+						%li
+							%a{:class=>"brand", :href=>"/events"} University Events
+		.row
+			.span1
+				%p
+			.span8
+				=yield
+			.span3
+				/menu
+				.well
+					%ul
+						.nav 
+							.navlist
+								%li
+									%i{:class=>"icon-home"} 
+									%a{:href=>"#"} Home
+								%li
+									%i{:class=>"icon-calendar"} 
+									%a{:href=>"/events"} Events
+								%li
+									%i{:class=>"icon-user"} 
+									%a{:href=>"#"} Login
+								%li
+								%li
+									%i{:class=>"icon-search"}
+									%a{:href=>"#{}"} Search

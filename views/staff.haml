@@ -1,0 +1,6 @@
+%h1 Staff
+%p
+- @res.each do |row|
+	.well
+		%h2 
+			== #{row["name"]} 
