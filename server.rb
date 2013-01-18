@@ -2,9 +2,10 @@
 #
 # Ruby RESTful server
 # Dissertation Project 2012-13
+# Not full REST
 # 
 # Implementing a server in Ruby using the principles of REST
-# The server allows applications to manage/book university events
+# The server allows applications to manage/book events
 #
 # author: Laura McCormack
 
@@ -76,12 +77,25 @@ end
 
 # handle http PUT request on event update event - input is form
 put '/event/:id' do
-	@res = dbconn.query()
+	###### update the event with given id using form data
+	test = dbconn.query("SELECT * FROM events WHERE id='#{id}';")
+	if(test.count == 0)
+		## event not found in db
+	else
+		name = dbconn.escape(params[:name])
+		details = dbconn.escape(params[:details])
+		date = dbconn.escape(params[:date])
+		time = dbconn.escape(params[:time])
+		##update event
+		dbconn.query("UPDATE TABLE events SET name='#{name}'), details='#{details}', date='#{date}', time=#{time} WHERE id='#{:id}';")
+	end
 end
 
 # handle http DELETE request on event
 delete '/event/:id' do
 	query = dbconn.query("DELETE FROM events WHERE id ='#{id}';")
+	#show page
+	haml :index
 end
 
 # handle http GET request on staff
@@ -98,8 +112,28 @@ get '/staff/:id' do
 	haml :staff
 end
 
+# new staff member
+get '/staff/new' do
+	haml :newstaff
+end
+
 # handle http POST request on staff
 post '/staff' do
+	# get the information from the form
+	firstname = dbconn.escape(params[:firstname])
+	lastname = dbconn.escape(params[:lastname])
+	email = dbconn.escape(params[:email])
+	dob = dbconn.escape(params[:dob])
+
+	#run the query unless a member with the same email exists already
+	test = dbconn.query("SELECT * FROM staff WHERE email = '#{email}';")
+	if(test.count == 0) #add staff member to db
+		dbconn.query("INSERT INTO staff(firstname, lastname, email, dob) VALUES ('#{firstname}', '#{lastname}',#{email}','#{dob}');")
+		
+	else
+		#error staff with email already exists
+	end
+
 end
 
 # handle http PUT request on staff
@@ -124,6 +158,12 @@ end
 #### endpoints for creating a new user
 get '/user/new' do
 	haml :newuser
+end
+
+get '/user/:id' do
+	@res = dbconn.query("SELECT * FROM users WHERE id = '#{:id}';")
+
+	haml :users
 end
 
 # handle http POST request on user
