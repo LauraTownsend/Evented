@@ -15,6 +15,11 @@ require 'haml'
 require 'mysql2'
 require 'json'
 require './config/MyConfig.rb'
+require 'bcrypt'
+
+#allow sessions and set session secret
+enable :sessions
+set :session_secret, MyConfig::SessionKey || 'too secret'
 
 #set the format for all haml docs used
 set :haml, :format => :html5
@@ -23,6 +28,10 @@ set :haml, :format => :html5
 dbconn = Mysql2::Client.new(:host => MyConfig::Host, :username => MyConfig::Username, :password => MyConfig::Password, :database => MyConfig::Database)
 ##### set up so that errors are caught and connection closed 
 #conn = PG.connect( dbhost: '127.0.0.1', dbname: "unievents" )
+
+before do
+	@user = session[:email]
+end
 
 get '/' do
 	#:haml index
@@ -33,7 +42,7 @@ end
 # handle http GET request on events (show all events)
 get '/events' do
 	# select all the events from the database in order of date
-	@res = dbconn.query("SELECT id,name,details,DATE_FORMAT(date, '%d-%m-%y') AS date, time FROM events ORDER BY date;")
+	@res = dbconn.query("SELECT id,name,details,DATE_FORMAT(date, '%d-%m-%y') AS date, time FROM events WHERE date >= CURDATE() ORDER BY date;")
 
 	haml :index
 end
@@ -75,29 +84,6 @@ get '/event/new' do
 	haml :eventform
 end
 
-# handle http PUT request on event update event - input is form
-put '/event/:id' do
-	###### update the event with given id using form data
-	test = dbconn.query("SELECT * FROM events WHERE id='#{id}';")
-	if(test.count == 0)
-		## event not found in db
-	else
-		name = dbconn.escape(params[:name])
-		details = dbconn.escape(params[:details])
-		date = dbconn.escape(params[:date])
-		time = dbconn.escape(params[:time])
-		##update event
-		dbconn.query("UPDATE TABLE events SET name='#{name}'), details='#{details}', date='#{date}', time=#{time} WHERE id='#{:id}';")
-	end
-end
-
-# handle http DELETE request on event
-delete '/event/:id' do
-	query = dbconn.query("DELETE FROM events WHERE id ='#{id}';")
-	#show page
-	haml :index
-end
-
 # handle http GET request on staff
 get '/staff' do
 	@res = dbconn.query("SELECT * FROM staff;")
@@ -124,25 +110,16 @@ post '/staff' do
 	lastname = dbconn.escape(params[:lastname])
 	email = dbconn.escape(params[:email])
 	dob = dbconn.escape(params[:dob])
+	password = BCrypt::Password.create(dbconn.escape(params[:password]))
 
 	#run the query unless a member with the same email exists already
 	test = dbconn.query("SELECT * FROM staff WHERE email = '#{email}';")
 	if(test.count == 0) #add staff member to db
-		dbconn.query("INSERT INTO staff(firstname, lastname, email, dob) VALUES ('#{firstname}', '#{lastname}',#{email}','#{dob}');")
+		dbconn.query("INSERT INTO staff(firstname, lastname, email, dob,password) VALUES ('#{firstname}', '#{lastname}',#{email}','#{dob}','#{password}');")
 		
 	else
 		#error staff with email already exists
 	end
-
-end
-
-# handle http PUT request on staff
-put '/staff' do
-
-end
-
-# handle http DELETE request on staff
-delete '/staff' do
 
 end
 
@@ -168,15 +145,40 @@ end
 
 # handle http POST request on user
 post '/user' do
+	# get the information from the form
+	firstname = dbconn.escape(params[:firstname])
+	lastname = dbconn.escape(params[:lastname])
+	email = dbconn.escape(params[:email])
+	dob = dbconn.escape(params[:dob])
+	password = BCrypt::Password.create(dbconn.escape(params[:password]))
+
+	#run the query unless a member with the same email exists already
+	test = dbconn.query("SELECT * FROM staff WHERE email = '#{email}';")
+	if(test.count == 0) #add staff member to db
+		dbconn.query("INSERT INTO users(firstname, lastname, email, dob, password) VALUES ('#{firstname}', '#{lastname}',#{email}','#{dob}', '#{password}');")
+		
+	else
+		#error user with email already exists
+	end
 
 end
 
-# handle http PUT request on user
-put '/user' do
-
+##### Login Endpoints
+get '/login' do
+	haml :login
 end
 
-# handle http DELETE request on user
-delete '/user' do
+post '/login' do
+	email = dbconn.escape(params[:email])
+	password = BCrypt::Password.create(dbconn.escape(params[:email]))
+	#check if email exists in DB
+	pword = dbconn.query("SELECT password FROM users WHERE email = '#{email}';")
 
+	if pword.count == 1 && password == pword[0]["password"]
+		# check password against password given
+		
+		session[:email] = params[:email]
+	else
+		#user does not exist redirect to '/user/new'
+	end
 end
