@@ -148,7 +148,7 @@ post '/user' do
 	# get the information from the form
 	firstname = dbconn.escape(params[:firstname])
 	lastname = dbconn.escape(params[:lastname])
-	email = dbconn.escape(params[:email])
+	email = params[:email]
 	dob = dbconn.escape(params[:dob])
 	password = BCrypt::Password.create(dbconn.escape(params[:password]))
 
