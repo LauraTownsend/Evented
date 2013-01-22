@@ -34,4 +34,7 @@ class User
 		@pword=pword
 	end
 
+	def initialise
+
+	end
 end

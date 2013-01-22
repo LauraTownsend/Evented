@@ -10,6 +10,16 @@
 					%ul
 						%li
 							%a{:class=>"brand", :href=>"/events"} University Events
+						%li
+							-if login?
+								==%p Hello, #{@user.firstname} #{@user.lastname}
+								%a{:class=>"pull-right", :href=>"/logout"} Logout
+							-else
+								%form{:class=>"navbar-form pull-right", :action=>"/login", :method=>"POST"}
+									%input{:type=>"text", :class=>"span2", :placeholder=>"email",:name=>"email",:id=>"email"}
+									%input{:type=>"password", :class=>"span2", :placeholder=>"password", :name=>"password", :id=>"password"}
+									%button{:type=>"submit", :class=>"btn"} Login
+						
 		.row
 			.span1
 				%p
@@ -29,7 +39,7 @@
 									%a{:href=>"/events"} Events
 								%li
 									%i{:class=>"icon-user"} 
-									%a{:href=>"#"} Login
+									%a{:href=>"/login"} Login
 								%li
 								%li
 									%i{:class=>"icon-search"}

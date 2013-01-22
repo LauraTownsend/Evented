@@ -16,6 +16,7 @@ require 'mysql2'
 require 'json'
 require './config/MyConfig.rb'
 require 'bcrypt'
+require './User.rb'
 
 #allow sessions and set session secret
 enable :sessions
@@ -29,12 +30,21 @@ dbconn = Mysql2::Client.new(:host => MyConfig::Host, :username => MyConfig::User
 ##### set up so that errors are caught and connection closed 
 #conn = PG.connect( dbhost: '127.0.0.1', dbname: "unievents" )
 
-@user = User.new()
-
 before do
+	@user = User.new()
 	@user.email = session[:email]
 	@user.firstname = session[:firstname]
 	@user.lastname = session[:lastname]
+end
+
+helpers do
+	def login?
+		if session[:email].nil?
+			return false
+		else
+			return true
+		end
+	end
 end
 
 get '/' do
@@ -152,20 +162,26 @@ post '/user' do
 	# get the information from the form
 	firstname = dbconn.escape(params[:firstname])
 	lastname = dbconn.escape(params[:lastname])
-	email = params[:email]
+	email = dbconn.escape(params[:email])
 	dob = dbconn.escape(params[:dob])
 
 	#generate salt and hash for password
 	salt = BCrypt::Engine.generate_salt
-	password = BCrypt::Password.hash_secret(dbconn.escape(params[:password]),salt)
+	password = BCrypt::Engine.hash_secret(dbconn.escape(params[:password]),salt)
 
 	#run the query unless a member with the same email exists already
 	test = dbconn.query("SELECT * FROM users WHERE email = '#{email}';")
 	if(test.count == 0) #add staff member to db
-		dbconn.query("INSERT INTO users(firstname, lastname, email, dob, password,password_salt) VALUES ('#{firstname}', '#{lastname}','#{email}','#{dob}', '#{password}','#{salt}');")
-		
+		dbconn.query("INSERT INTO users(firstname, lastname, email, dob, password,salt) VALUES ('#{firstname}', '#{lastname}','#{email}','#{dob}', '#{password}','#{salt}');")
+		session[:firstname]=firstname
+		session[:lastname]=lastname
+		session[:email]=email
+		session[:dob]=dob
+
+		redirect '/'
 	else
 		#error user with email already exists
+		"error"
 	end
 
 end
@@ -177,23 +193,36 @@ end
 
 post '/login' do
 	email = dbconn.escape(params[:email])
-	password = dbconn.escape(params[:email])
+	password = dbconn.escape(params[:password])
 	#check if email exists in DB
-	pword = dbconn.query("SELECT * FROM users WHERE email = '#{email}';")
-	puts pword
+	query = dbconn.query("SELECT * FROM users WHERE email = '#{email}';")
 
-	if pword.count == 1
+	if query.count == 1
 		# check password against password given
-		pword.each do |row|
-			if row["password"] == password
+		query.each do |user|
+			if user["password"] == BCrypt::Engine.hash_secret(password,user["salt"])
 				session[:email] = params[:email]
-				puts session[:email]
+				session[:firstname] = user["firstname"]
+				session[:lastname] = user["lastname"]
 				redirect '/events'
 			else
 				##error
+				"error"
 			end
 		end
 	else
 		#user does not exist redirect to '/user/new'
+		"error"
 	end
+end
+
+get '/logout' do
+	#clear sessions 
+	session[:email] = nil
+	session[:firstname] = nil
+	session[:lastname] = nil
+	
+	session[:lastnane] = nil
+
+	redirect '/'
 end
