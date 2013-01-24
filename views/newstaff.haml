@@ -1,0 +1,26 @@
+%form{:class=>"form-horizontal", :action=>"/user", :method=>"post"}
+	%legend New Admin User
+	.control-group
+		%label{:class=>"control-label", :for=>"firstname"} First Name
+		.controls
+			%input{:type=>"text", :placeholder=>"firstname", :id=>"firstname", :name=>"firstname"}
+	.control-group
+		%label{:class=>"control-label", :for=>"lastname"} Last Name
+		.controls
+			%input{:type=>"text", :placeholder=>"lastname", :name=>"lastname", :id=>"lastname"}
+	.control-group
+		%label{:class=>"control-label", :for=>"email"} E-mail
+		.controls
+			%input{:type=>"text", :placeholder=>"email", :name=>"email", :id=>"email"}
+	.control-group
+		%label{:class=>"control-label", :for=>"password"} Password
+		.controls
+			%input{:type=>"password", :placeholder=>"password", :name=>"password", :id=>"password"}
+	.control-group
+		%label{:class=>"control-label", :for=>"dob"} Date of Birth
+		.controls
+			%input{:type=>"date", :placeholder=>"yy/mm/dd",:name=>"dob",:id=>"dob"} 
+	.control-group
+		%label{:class=>"control-label", :for=>"submit"}
+		.controls
+			%button{:type=>"submit",:class=>"btn",:id=>"submit", :name=>"submit"} Register

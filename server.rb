@@ -207,12 +207,14 @@ post '/login' do
 				redirect '/events'
 			else
 				##error
-				"error"
+				@errormessage="Incorrect email or password"
+				haml :errors
 			end
 		end
 	else
 		#user does not exist redirect to '/user/new'
-		"error"
+		@errormessage="Incorrect email or password"
+		haml :errors
 	end
 end
 
