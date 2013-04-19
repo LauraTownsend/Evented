@@ -1,17 +1,15 @@
-# University Events Web Application
+# Events Web Application
 #
 # Ruby RESTful server
 # Dissertation Project 2012-13
 # Not full REST
 # 
-# Implementing a server in Ruby using the principles of REST
 # The server allows applications to manage/book events
 #
 # author: Laura McCormack
 
 require 'sinatra'
 require 'haml'
-#require 'pg'
 require 'mysql2'
 require 'json'
 require './config/MyConfig.rb'
@@ -140,7 +138,7 @@ end
 ##### USER requests
 
 # handle http GET request on user
-get '/user' do
+get '/users' do
 	@res = dbconn.query("SELECT * FROM users;");
 
 	haml :users
